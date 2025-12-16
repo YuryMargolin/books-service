@@ -10,7 +10,7 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "keywords": [],
-  "author": "edward",
+  "author": "yury",
   "license": "ISC",
   "dependencies": {
     "cross-env": "^10.1.0",

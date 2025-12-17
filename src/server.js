@@ -2,12 +2,14 @@ import dotenv from 'dotenv';
 import express from 'express';
 import {dbConnection} from "./config/database.js";
 import {syncModels} from "./model/index.js";
+import bookRouter from "./routs/book.routes.js";
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 8080;
 
 app.use(express.json());
+app.use(bookRouter);
 
 
 app.use((err, req, res, next) => {

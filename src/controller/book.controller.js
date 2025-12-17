@@ -8,7 +8,7 @@ export const addBook = async (req, res) => {
         const existingBook = await Book.findByPk(isbn);
         if (existingBook) {
             await t.rollback();
-            res.status(409).send({
+            return res.status(409).send({
                 error: `Book with isbn ${isbn} already exists`
             });
         }
@@ -37,15 +37,32 @@ export const addBook = async (req, res) => {
             {transaction: t});
         await book.setAuthors(authorRecords, {transaction: t});
         await t.commit();
-        res.status(201).send(book);
+        return res.status(201).send(book);
     } catch (e) {
         await t.rollback();
         console.log('Error adding book:', e);
-        res.status(500).send({
+        return res.status(500).send({
             error: e.message,
             message: 'Failed to add book'
         });
     }
+};
 
+export const findBookByIsbn = async (req, res) => {
+    const book = await Book.findByPk(req.params.isbn);
+    if (book) {
+        const result = {
+            isbn: book.isbn,
+            title: book.title,
+            publisher: book.publisher,
+            authors:(await book.getAuthors()).map(a => ({
+                name: a.dataValues.name,
+                birthDate: a.dataValues.birth_date
+            }))
 
-}
+        }
+        return res.json(result);
+    } else {
+        return res.status(404).send({error: `Book with isbn ${req.params.isbn} not found`});
+    }
+};

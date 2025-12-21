@@ -154,3 +154,26 @@ export const findBooksByAuthor = async (req, res) => {
     });
     return res.json(books);
 }
+
+export const findBooksByPublisher = async (req, res) => {
+    if (!await Publisher.findByPk(req.params.name)) {
+        return res.status(404).send({error: `Publisher with name ${req.params.name} not found`});
+    }
+    const books = await Book.findAll({
+            where: {
+                publisher: req.params.name
+            },
+            include: [
+                {
+                    model: Author, as: 'authors',
+                    attributes: {
+                        include: [[sequelize.col('birth_date'), 'birthDate']],
+                        exclude: ['birth_date']
+                    },
+                    through: {attributes: []}
+                }
+            ]
+        }
+    )
+    return res.json(books);
+}
